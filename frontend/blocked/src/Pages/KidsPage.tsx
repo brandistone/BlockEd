@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { ArrowRight, Star, Trophy, Gift, Lock, CheckCircle, Sparkles, Users } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { ArrowRight, Star, Trophy, Gift, Lock, CheckCircle, Sparkles, Zap, Lightbulb, Shield } from "lucide-react"
 
 // Custom Toast Implementation
 interface ToastProps {
@@ -40,7 +41,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="bg-black/40 backdrop-blur-xl border border-purple-500/30 rounded-lg p-4 shadow-lg max-w-md"
+            className="bg-black/80 backdrop-blur-xl border border-purple-500/30 rounded-lg p-4 shadow-lg max-w-md"
           >
             <h4 className="font-bold text-white">{toast.title}</h4>
             <p className="text-sm text-purple-200">{toast.description}</p>
@@ -51,58 +52,25 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   )
 }
 
-// Particle Field from Event Platform
-const ParticleField = () => {
+// Particle field component
+const ParticleField: React.FC = () => {
   return (
-    <div className="fixed inset-0 opacity-30">
-      {[...Array(50)].map((_, i) => (
+    <div className="fixed inset-0 opacity-50">
+      {[...Array(100)].map((_, i) => (
         <div
           key={i}
           className="absolute rounded-full animate-float"
           style={{
-            width: `${Math.random() * 4 + 1}px`,
-            height: `${Math.random() * 4 + 1}px`,
+            width: `${Math.random() * 6 + 1}px`,
+            height: `${Math.random() * 6 + 1}px`,
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
-            background: `rgba(${Math.random() * 100 + 100}, ${Math.random() * 50 + 50}, ${Math.random() * 255}, 0.6)`,
-            animationDuration: `${Math.random() * 10 + 10}s`,
+            background: `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100}, 255, 0.8)`,
+            animationDuration: `${Math.random() * 15 + 10}s`,
             animationDelay: `-${Math.random() * 10}s`,
           }}
         />
       ))}
-    </div>
-  )
-}
-
-// Animated Card from Event Platform
-const AnimatedCard: React.FC<{
-  children: React.ReactNode
-  delay?: number
-  onClick?: () => void
-  isSelected?: boolean
-}> = ({ children, delay = 0, onClick, isSelected = false }) => {
-  const [isHovered, setIsHovered] = useState(false)
-
-  return (
-    <div
-      className={`relative group transition-all duration-500 transform 
-        ${isSelected ? "scale-105 -translate-y-2" : ""} 
-        ${isHovered ? "translate-y-[-8px]" : ""}`}
-      style={{ animationDelay: `${delay}ms` }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={onClick}
-    >
-      <div
-        className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-400/20 rounded-xl blur-xl 
-        group-hover:blur-2xl transition-all duration-300"
-      />
-      <div
-        className="relative bg-black/40 backdrop-blur-xl rounded-xl border border-purple-500/30 
-        group-hover:border-purple-500/50 p-6 transition-all duration-300"
-      >
-        {children}
-      </div>
     </div>
   )
 }
@@ -128,44 +96,59 @@ const GameCard: React.FC<GameCardProps> = ({
   locked = false,
   onClick,
 }) => {
+  const [isHovered, setIsHovered] = useState<boolean>(false)
+
   return (
-    <AnimatedCard isSelected={completed} onClick={locked ? undefined : onClick}>
-      <div className={`relative ${locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}>
-        <div
-          className={`w-16 h-16 mb-6 rounded-xl bg-gradient-to-r from-purple-600 to-purple-400
-          flex items-center justify-center transform group-hover:rotate-12 transition-all duration-500
-          ${completed ? "from-purple-500 to-purple-300" : locked ? "from-gray-700 to-gray-600" : ""}`}
-        >
-          {locked ? <Lock className="w-8 h-8 text-white" /> : icon}
+    <div
+      className={`relative rounded-xl overflow-hidden transition-all duration-300 transform
+        ${locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"} 
+        ${isHovered && !locked ? "scale-105 -translate-y-2" : ""}`}
+      onClick={locked ? undefined : onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div
+        className={`absolute inset-0 bg-gradient-to-br ${color} opacity-20 blur-lg 
+        ${isHovered ? "blur-xl" : ""}`}
+      />
+      <div
+        className={`relative h-full p-6 backdrop-blur-xl rounded-xl border-2
+          ${completed ? "border-purple-500" : locked ? "border-gray-700" : `border-purple-500/30 bg-gradient-to-br ${color} bg-opacity-20`}`}
+      >
+        <div className="flex items-center mb-4">
+          <div
+            className={`w-12 h-12 rounded-lg flex items-center justify-center mr-4 
+              ${completed ? "bg-purple-500" : locked ? "bg-gray-700" : `bg-gradient-to-br ${color}`}
+              ${isHovered ? "rotate-12" : ""} transition-all duration-500`}
+          >
+            {locked ? <Lock className="w-6 h-6 text-white" /> : icon}
+          </div>
+          <h3 className="text-xl font-bold text-white">
+            {title}
+            {completed && (
+              <span className="ml-2 inline-flex items-center">
+                <Star className="w-4 h-4 text-purple-300" />
+              </span>
+            )}
+          </h3>
         </div>
-        <h3
-          className="text-xl font-semibold mb-4 bg-gradient-to-r from-white to-gray-300 
-          bg-clip-text text-transparent"
-        >
-          {title}
-          {completed && (
-            <span className="ml-2 inline-flex items-center">
-              <Star className="w-4 h-4 text-purple-400" />
-            </span>
-          )}
-        </h3>
-        <p className="text-gray-400 group-hover:text-gray-300 transition-colors mb-4">{description}</p>
+        <p className="text-gray-300 mb-4">{description}</p>
         <button
           className={`w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2 font-medium
             ${
               completed
-                ? "bg-gradient-to-r from-purple-600 to-purple-400 text-white"
+                ? "bg-purple-500 text-white"
                 : locked
-                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-600 to-purple-400 text-white hover:opacity-90"
+                  ? "bg-gray-700 text-gray-400"
+                  : `bg-gradient-to-r from-purple-600 to-blue-600 text-white`
             } transition-all duration-300`}
           disabled={locked}
         >
           <span>{completed ? "Play Again" : locked ? "Locked" : "Play Now"}</span>
-          {!locked && <ArrowRight className="w-4 h-4 ml-2" />}
+          {!locked && <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />}
         </button>
       </div>
-    </AnimatedCard>
+    </div>
   )
 }
 
@@ -179,9 +162,20 @@ interface CharacterProps {
 }
 
 const Character: React.FC<CharacterProps> = ({ name, image, selected, locked = false, onClick }) => {
+  const [isHovered, setIsHovered] = useState<boolean>(false)
+
   return (
-    <AnimatedCard isSelected={selected} onClick={locked ? undefined : onClick}>
-      <div className={`relative ${locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}>
+    <div
+      className={`relative rounded-xl overflow-hidden transition-all duration-300
+        ${locked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} 
+        ${selected ? "ring-4 ring-purple-400 transform scale-105" : ""}
+        ${isHovered && !locked && !selected ? "translate-y-[-8px]" : ""}`}
+      onClick={locked ? undefined : onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-blue-600/20 opacity-20" />
+      <div className="relative p-4 backdrop-blur-md">
         <div className="mb-4 rounded-lg overflow-hidden aspect-square">
           <img src={image || "/placeholder.svg"} alt={name} className="w-full h-full object-cover" />
           {locked && (
@@ -192,12 +186,12 @@ const Character: React.FC<CharacterProps> = ({ name, image, selected, locked = f
         </div>
         <h4 className="text-center font-medium text-white">{name}</h4>
         {selected && (
-          <div className="absolute top-2 right-2 bg-purple-500 rounded-full p-1">
-            <CheckCircle className="w-4 h-4 text-black" />
+          <div className="absolute top-2 right-2 bg-purple-400 rounded-full p-1">
+            <CheckCircle className="w-4 h-4 text-white" />
           </div>
         )}
       </div>
-    </AnimatedCard>
+    </div>
   )
 }
 
@@ -258,18 +252,13 @@ const BlockchainGame: React.FC<SimpleGameProps> = ({ onComplete, onBack }) => {
   }
 
   return (
-    <div className="relative bg-black/40 backdrop-blur-xl border border-purple-500/30 rounded-xl p-6">
+    <div className="relative bg-[#120A38]/60 backdrop-blur-md border-2 border-purple-700/30 rounded-xl p-6">
       <button onClick={onBack} className="inline-flex items-center text-purple-400 mb-6 group">
         <ArrowRight className="w-4 h-4 mr-2 transform rotate-180 group-hover:-translate-x-1 transition-transform" />
         <span>Back to Games</span>
       </button>
 
-      <h2
-        className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-white to-gray-300 
-        bg-clip-text text-transparent"
-      >
-        Build Your Blockchain!
-      </h2>
+      <h2 className="text-2xl font-bold text-center mb-6">Build Your Blockchain!</h2>
       <p className="text-center text-gray-300 mb-8">
         Click on the blocks in order (1-5) to create a valid blockchain. All blocks must be connected!
       </p>
@@ -285,10 +274,10 @@ const BlockchainGame: React.FC<SimpleGameProps> = ({ onComplete, onBack }) => {
                   selectedBlocks.includes(blockId)
                     ? validated
                       ? gameCompleted
-                        ? "bg-gradient-to-r from-purple-600 to-purple-400 border-2 border-purple-300"
-                        : "bg-gradient-to-r from-purple-600 to-purple-400 border-2 border-purple-300"
-                      : "bg-gradient-to-r from-purple-600 to-purple-400 border-2 border-purple-300"
-                    : "bg-black/40 backdrop-blur-xl border-2 border-purple-500/30 hover:border-purple-500/50"
+                        ? "bg-purple-500 border-2 border-purple-300"
+                        : "bg-purple-500 border-2 border-purple-300"
+                      : "bg-purple-500 border-2 border-purple-300"
+                    : "bg-[#1A0F4D] border-2 border-purple-900/50 hover:bg-[#231463]"
                 }
                 ${selectedBlocks.includes(blockId) && "transform scale-110"}`}
             >
@@ -312,7 +301,7 @@ const BlockchainGame: React.FC<SimpleGameProps> = ({ onComplete, onBack }) => {
             ${
               selectedBlocks.length !== blocks.length || validated
                 ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-purple-600 to-purple-400 text-white hover:opacity-90"
+                : "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90"
             }`}
         >
           {gameCompleted ? "Blockchain Valid!" : validated ? "Validating..." : "Validate Chain"}
@@ -322,23 +311,36 @@ const BlockchainGame: React.FC<SimpleGameProps> = ({ onComplete, onBack }) => {
   )
 }
 
+// Add the import for BlockchainConnect
+import BlockchainConnect from "../components/BlockchainConnect"
+
 // Main Page Component
 const KidsPage: React.FC = () => {
-  // Using a custom navigate function since we might not have React Router in all environments
-  const navigate = (path: string) => {
-    window.location.href = path
-  }
-
+  const navigate = useNavigate()
   const [activeGame, setActiveGame] = useState<number | null>(null)
   const [completedGames, setCompletedGames] = useState<number[]>([])
   const [points, setPoints] = useState(0)
   const [selectedCharacter, setSelectedCharacter] = useState(0)
   const [showCharacterSelection, setShowCharacterSelection] = useState(false)
   const [ocid, setOcid] = useState<string>("")
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const { toast } = useToast()
+  const [isVisible, setIsVisible] = useState<boolean>(false)
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  // Add these state variables to the KidsPage component
+  const [walletConnected, setWalletConnected] = useState(false)
+  const [userAddress, setUserAddress] = useState<string | null>(null)
+
+  // Add a new state variable to control the wallet connection popup visibility:
+  const [showWalletConnect, setShowWalletConnect] = useState(false)
 
   useEffect(() => {
+    setIsVisible(true)
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY })
+    }
+    window.addEventListener("mousemove", handleMouseMove)
+
     // Load saved data from localStorage
     const savedData = localStorage.getItem("kidsBlockchainData")
     if (savedData) {
@@ -360,13 +362,26 @@ const KidsPage: React.FC = () => {
 
     generateRandomOcid()
 
-    // Track mouse position for cursor effect
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-    }
-    window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
+
+  // Add these handler functions
+  const handleWalletConnect = (address: string) => {
+    setWalletConnected(true)
+    setUserAddress(address)
+
+    toast({
+      title: "Wallet Connected!",
+      description: `Connected to ${address.substring(0, 6)}...${address.substring(address.length - 4)}`,
+    })
+  }
+
+  const handleUserRegister = (name: string) => {
+    toast({
+      title: "Registration Successful!",
+      description: `Welcome to Blockchain Adventures, ${name}!`,
+    })
+  }
 
   const handleGameComplete = () => {
     if (activeGame !== null && !completedGames.includes(activeGame)) {
@@ -431,19 +446,19 @@ const KidsPage: React.FC = () => {
       title: "Build a Blockchain",
       description: "Connect blocks together to create your own blockchain!",
       icon: <Sparkles className="w-6 h-6 text-white" />,
-      color: "from-purple-600 to-purple-400",
+      color: "from-purple-700 to-purple-500",
     },
     {
       title: "Crypto Collector",
       description: "Collect digital coins while learning about cryptocurrencies!",
       icon: <Star className="w-6 h-6 text-white" />,
-      color: "from-purple-600 to-purple-400",
+      color: "from-purple-800 to-purple-600",
     },
     {
       title: "Decentralized Heroes",
       description: "Help the heroes protect the network from hackers!",
       icon: <Trophy className="w-6 h-6 text-white" />,
-      color: "from-purple-600 to-purple-400",
+      color: "from-purple-900 to-purple-700",
     },
     {
       title: "NFT Creator",
@@ -476,21 +491,29 @@ const KidsPage: React.FC = () => {
     },
   ]
 
-  const stats = [
-    { value: completedGames.length, label: "Badges Earned", icon: <Trophy className="w-5 h-5" />, color: "purple" },
-    { value: points, label: "Total Points", icon: <Star className="w-5 h-5" />, color: "purple" },
-    { value: "5", label: "Available Games", icon: <Gift className="w-5 h-5" />, color: "purple" },
+  const blockchainFacts = [
     {
-      value: characters.filter((c) => !c.locked).length,
-      label: "Characters",
-      icon: <Users className="w-5 h-5" />,
-      color: "purple",
+      icon: <Lightbulb className="w-8 h-8" />,
+      title: "Blocks Are Like Puzzle Pieces",
+      description: "Each block connects to the one before it, creating a chain that can't be broken!",
+      color: "from-purple-600 to-blue-600",
+    },
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: "Super Secure",
+      description: "Blockchain uses special codes that make it almost impossible for bad guys to change information.",
+      color: "from-purple-700 to-purple-500",
+    },
+    {
+      icon: <Zap className="w-8 h-8" />,
+      title: "Digital Treasures",
+      description: "You can collect digital items called NFTs that are truly yours - just like real treasures!",
+      color: "from-purple-800 to-purple-600",
     },
   ]
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Particles Background */}
+    <div className="min-h-screen bg-[#050314] text-white overflow-hidden">
       <ParticleField />
 
       {/* Dynamic Cursor Effect */}
@@ -500,7 +523,7 @@ const KidsPage: React.FC = () => {
           transform: `translate(${mousePosition.x - 128}px, ${mousePosition.y - 128}px)`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-purple-300/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
       </div>
 
       {/* Header */}
@@ -513,26 +536,27 @@ const KidsPage: React.FC = () => {
           </a>
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
-            <div>
+            <div
+              className={`transition-all duration-1000 delay-300 
+              ${isVisible ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
+            >
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 <div className="overflow-hidden">
                   <span className="inline-block animate-slide-up-fade">Blockchain</span>
                 </div>
                 <div className="overflow-hidden">
-                  <span
-                    className="inline-block bg-gradient-to-r from-purple-400 to-purple-200 
-                    bg-clip-text text-transparent animate-slide-up-fade delay-200"
-                  >
+                  <span className="inline-block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent animate-slide-up-fade delay-200">
                     Adventures
                   </span>
                 </div>
               </h1>
-              <p className="text-xl text-gray-300 mb-10 opacity-0 animate-fade-in delay-700">
+              <p className="text-xl text-blue-100 max-w-2xl opacity-0 animate-fade-in delay-700">
                 Join the fun and learn about blockchain through exciting games and activities!
               </p>
             </div>
 
-            <div className="mt-6 md:mt-0 flex items-center bg-black/40 backdrop-blur-xl rounded-xl p-3 border border-purple-500/30">
+            {/* Update the header profile card to use dark purple background */}
+            <div className="mt-6 md:mt-0 flex items-center bg-[#120A38]/60 backdrop-blur-md rounded-xl p-3 border border-purple-700/30">
               <div className="mr-4 relative">
                 <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-purple-400">
                   <img
@@ -543,7 +567,7 @@ const KidsPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setShowCharacterSelection(true)}
-                  className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full p-1"
+                  className="absolute -bottom-2 -right-2 bg-purple-500 rounded-full p-1"
                 >
                   <Sparkles className="w-4 h-4 text-white" />
                 </button>
@@ -560,70 +584,37 @@ const KidsPage: React.FC = () => {
           </div>
 
           {ocid && (
-            <div className="mb-6 inline-block bg-black/40 backdrop-blur-xl border border-purple-500/30 rounded-xl p-3">
+            <div className="mb-6 inline-block bg-[#120A38]/60 backdrop-blur-md border border-purple-700/30 rounded-xl p-3">
               <p className="text-xs text-purple-200">
                 Content OCID:{" "}
-                <span className="font-mono">
+                <span className="font-mono text-purple-200">
                   {ocid.slice(0, 10)}...{ocid.slice(-6)}
                 </span>
               </p>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Stats Section */}
-      <section className="py-6 px-6 relative">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
-            <div key={index} className="relative group cursor-pointer">
-              <div
-                className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-purple-400/20 
-                rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300"
-              />
-              <div
-                className="relative bg-black/40 backdrop-blur-xl rounded-xl border border-purple-500/30 
-                group-hover:border-purple-500/50 p-4 transform group-hover:translate-y-[-4px] 
-                transition-all duration-300"
-              >
-                <div className="flex items-center">
-                  <div
-                    className="w-10 h-10 rounded-full bg-purple-500/20 
-                    flex items-center justify-center mr-3 transform group-hover:scale-110 
-                    group-hover:rotate-12 transition-all duration-500"
-                  >
-                    {stat.icon}
-                  </div>
-                  <div>
-                    <div
-                      className="text-2xl font-bold bg-gradient-to-r from-purple-400 
-                      to-purple-300 bg-clip-text text-transparent"
-                    >
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
-                      {stat.label}
-                    </div>
-                  </div>
+          {completedGames.length > 0 && (
+            <div className="bg-[#120A38]/60 backdrop-blur-md rounded-xl p-4 border border-purple-700/30 mb-8 inline-block">
+              <div className="flex items-center">
+                <Trophy className="w-6 h-6 text-purple-400 mr-3" />
+                <div>
+                  <h3 className="font-bold text-white">Badges Earned: {completedGames.length}</h3>
+                  <p className="text-sm text-purple-200">Collect all badges to become a Blockchain Master!</p>
                 </div>
               </div>
             </div>
-          ))}
+          )}
         </div>
-      </section>
+      </div>
 
       {/* Main Content */}
       <div className="px-6 pb-20">
         <div className="max-w-7xl mx-auto">
           {showCharacterSelection ? (
-            <div className="bg-black/40 backdrop-blur-xl rounded-2xl border border-purple-500/30 p-6 mb-8">
+            <div className="bg-[#120A38]/60 backdrop-blur-md rounded-2xl border border-purple-700/30 p-6 mb-8">
               <div className="flex items-center justify-between mb-6">
-                <h2
-                  className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 
-                  bg-clip-text text-transparent"
-                >
-                  Choose Your Guide
-                </h2>
+                <h2 className="text-2xl font-bold">Choose Your Guide</h2>
                 <button
                   onClick={() => setShowCharacterSelection(false)}
                   className="text-purple-300 hover:text-white transition-colors"
@@ -651,10 +642,86 @@ const KidsPage: React.FC = () => {
             </div>
           ) : activeGame === null ? (
             <>
-              <h2
-                className="text-2xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 
-                bg-clip-text text-transparent"
-              >
+              {/* Blockchain Facts Section */}
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  Blockchain Fun Facts
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {blockchainFacts.map((fact, index) => (
+                    <div key={index} className="relative group">
+                      <div
+                        className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-purple-800/20 rounded-xl blur-lg 
+                        group-hover:blur-xl transition-all duration-300"
+                      />
+                      <div
+                        className="relative bg-[#120A38]/60 backdrop-blur-md rounded-xl border border-purple-700/30 
+                        group-hover:border-purple-600/50 p-6 h-full transform group-hover:translate-y-[-8px] 
+                        transition-all duration-300"
+                      >
+                        <div
+                          className={`w-14 h-14 mb-6 rounded-xl bg-gradient-to-r ${fact.color} 
+                          flex items-center justify-center transform group-hover:rotate-12 transition-all duration-500`}
+                        >
+                          {fact.icon}
+                        </div>
+                        <h3 className="text-xl font-semibold mb-4 text-white">{fact.title}</h3>
+                        <p className="text-gray-300 group-hover:text-gray-200 transition-colors">{fact.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Add this to the JSX, right before the game cards section */}
+              {!activeGame && !showCharacterSelection && (
+                <div className="mb-12">
+                  <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    Blockchain Wallet
+                  </h2>
+
+                  {walletConnected ? (
+                    <div className="bg-[#120A38]/60 backdrop-blur-md rounded-xl p-6 border-2 border-purple-700/30">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center mr-3">
+                          <span className="text-white font-bold">W</span>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white">Wallet Connected</h3>
+                          <p className="text-sm text-purple-200">
+                            {userAddress?.substring(0, 6)}...{userAddress?.substring(userAddress?.length - 4)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <button
+                        onClick={() => setShowWalletConnect((prev) => !prev)}
+                        className="group relative px-8 py-4 rounded-xl overflow-hidden cursor-pointer"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600" />
+                        <div
+                          className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 blur-xl 
+                          group-hover:blur-2xl transition-all duration-300"
+                        />
+                        <div className="relative z-10 flex items-center space-x-2">
+                          <span>Connect Blockchain Wallet</span>
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </button>
+
+                      {showWalletConnect && (
+                        <div className="mt-6">
+                          <BlockchainConnect onConnect={handleWalletConnect} onRegister={handleUserRegister} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Blockchain Games
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -678,7 +745,7 @@ const KidsPage: React.FC = () => {
               {activeGame === 0 ? (
                 <BlockchainGame onComplete={handleGameComplete} onBack={() => setActiveGame(null)} />
               ) : (
-                <div className="text-center bg-black/40 backdrop-blur-xl rounded-2xl border border-purple-500/30 p-12">
+                <div className="text-center bg-[#120A38]/60 backdrop-blur-md rounded-2xl border border-purple-700/30 p-12">
                   <button
                     onClick={() => setActiveGame(null)}
                     className="inline-flex items-center text-purple-300 mb-8 group"
@@ -687,16 +754,11 @@ const KidsPage: React.FC = () => {
                     <span>Back to Games</span>
                   </button>
 
-                  <h2
-                    className="text-2xl font-bold mb-4 bg-gradient-to-r from-white to-gray-300 
-                    bg-clip-text text-transparent"
-                  >
-                    {games[activeGame].title}
-                  </h2>
+                  <h2 className="text-2xl font-bold mb-4">{games[activeGame].title}</h2>
                   <p className="text-gray-200 mb-8">This game is under construction! Please check back soon.</p>
 
                   <div className="flex justify-center">
-                    <div className="animate-pulse bg-gradient-to-r from-purple-600 to-purple-400 p-4 rounded-full">
+                    <div className="animate-bounce bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-full">
                       {games[activeGame].icon}
                     </div>
                   </div>
@@ -704,6 +766,42 @@ const KidsPage: React.FC = () => {
               )}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <div className="py-12 px-6 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/10 to-blue-900/10 backdrop-blur-sm" />
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              Ready for More Blockchain Fun?
+            </h2>
+            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+              Complete games to earn badges and unlock new characters for your blockchain adventures!
+            </p>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="group relative px-8 py-4 rounded-xl overflow-hidden cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600" />
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 blur-xl 
+                group-hover:blur-2xl transition-all duration-300"
+              />
+              <div className="relative z-10 flex items-center space-x-2">
+                <span>Back to Top</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+          </div>
+
+          <div className="border-t border-purple-500/20 mt-12 pt-8 text-center">
+            <p className="text-purple-300 text-sm">© 2025 EduChain. All rights reserved.</p>
+            <p className="text-gray-500 text-xs mt-2">
+              A fun and educational platform for kids to learn about blockchain technology.
+            </p>
+          </div>
         </div>
       </div>
     </div>

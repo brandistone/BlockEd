@@ -21,6 +21,17 @@ import {
 } from "lucide-react"
 
 // Add this at the top of the file, after the imports
+/*
+ * Content Security Policy (CSP) Compliance Notes:
+ *
+ * This file avoids using the following CSP-violating patterns:
+ * - eval() or new Function() for string evaluation
+ * - setTimeout/setInterval with string arguments
+ * - Inline event handlers with string code
+ *
+ * All dynamic code execution uses function references instead of strings.
+ * If you modify this file, please maintain CSP compliance.
+ */
 declare global {
   interface Window {
     ethereum?: {
@@ -387,25 +398,53 @@ const HomePage: React.FC = () => {
       // If EduChain wallet is not available, try MetaMask
       else if (window.ethereum) {
         try {
-          // Request account access
-          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
-          const account = accounts[0]
+          // Check if MetaMask is installed
+          if (window.ethereum.isMetaMask) {
+            // Request account access with error handling
+            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
 
-          setWalletAddress(account)
-          setWalletConnected(true)
+            if (accounts && accounts.length > 0) {
+              const account = accounts[0]
 
-          // Create an NFT for the user
-          createEducationalNFT()
+              setWalletAddress(account)
+              setWalletConnected(true)
 
-          toast({
-            title: "Wallet Connected",
-            description: `Successfully connected to ${account.slice(0, 6)}...${account.slice(-4)}`,
-          })
+              // Create an NFT for the user - ensure this doesn't use eval() internally
+              createEducationalNFT()
+
+              toast({
+                title: "MetaMask Connected",
+                description: `Successfully connected to ${account.slice(0, 6)}...${account.slice(-4)}`,
+              })
+            } else {
+              throw new Error("No accounts returned from MetaMask")
+            }
+          } else {
+            toast({
+              title: "MetaMask Not Detected",
+              description: "Please install MetaMask extension",
+            })
+            setShowWalletModal(true)
+          }
         } catch (error) {
-          console.error("User denied account access", error)
+          console.error("MetaMask connection error:", error)
+
+          // Handle specific MetaMask errors
+          let errorMessage = "You rejected the connection request"
+
+          if (typeof error === "object" && error !== null) {
+            if ("code" in error && error.code === 4001) {
+              errorMessage = "You rejected the connection request"
+            } else if ("code" in error && error.code === -32002) {
+              errorMessage = "Connection request already pending. Check MetaMask extension"
+            } else if ("message" in error && typeof error.message === "string") {
+              errorMessage = error.message
+            }
+          }
+
           toast({
             title: "Connection Failed",
-            description: "You rejected the connection request",
+            description: errorMessage,
           })
         }
       }
@@ -453,10 +492,13 @@ const HomePage: React.FC = () => {
     }
   }
 
+  // In the createEducationalNFT function, ensure we're not using string evaluation
   const createEducationalNFT = (): void => {
     // This would interact with a smart contract in a real implementation
     // Here we're just simulating the NFT creation
 
+    // ❌ AVOID: setTimeout("toast({...})", 3000)
+    // ✅ CORRECT: Use function reference
     setTimeout(() => {
       toast({
         title: "Welcome NFT Minted!",
@@ -465,14 +507,39 @@ const HomePage: React.FC = () => {
     }, 3000)
   }
 
+  // In the handleUserTypeSelect function, ensure we're using function references
   const handleUserTypeSelect = (index: number): void => {
     setSelectedUserType(index)
     const selectedType = userTypes[index]
 
     // Navigate to the corresponding page
+    // ❌ AVOID: setTimeout("navigate(selectedType.path)", 500)
+    // ✅ CORRECT: Use function reference
     setTimeout(() => {
       navigate(selectedType.path)
     }, 500)
+  }
+
+  const checkMetaMaskInstallation = (): boolean => {
+    if (!window.ethereum) {
+      toast({
+        title: "MetaMask Not Installed",
+        description: "Please install MetaMask extension to connect your wallet",
+      })
+      setShowWalletModal(true)
+      return false
+    }
+
+    if (!window.ethereum.isMetaMask) {
+      toast({
+        title: "MetaMask Not Detected",
+        description: "Please ensure MetaMask extension is properly installed",
+      })
+      setShowWalletModal(true)
+      return false
+    }
+
+    return true
   }
 
   // Update the WalletSelectionModal component to show MetaMask and EduChain wallet options
@@ -507,7 +574,11 @@ const HomePage: React.FC = () => {
 
             <button
               onClick={() => {
-                window.open("https://metamask.io/download/", "_blank")
+                if (window.ethereum && window.ethereum.isMetaMask) {
+                  connectWallet()
+                } else {
+                  window.open("https://metamask.io/download/", "_blank")
+                }
                 setShowWalletModal(false)
               }}
               className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/30 rounded-lg hover:border-purple-500/50 transition-all"
@@ -518,7 +589,11 @@ const HomePage: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-medium text-white">MetaMask</h4>
-                  <p className="text-xs text-gray-400">Connect using MetaMask wallet</p>
+                  <p className="text-xs text-gray-400">
+                    {window.ethereum && window.ethereum.isMetaMask
+                      ? "Connect using MetaMask wallet"
+                      : "Install MetaMask wallet"}
+                  </p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -541,40 +616,90 @@ const HomePage: React.FC = () => {
     // Listen for account changes
     if (window.ethereum) {
       const handleAccountsChanged = (accounts: unknown) => {
-        const addressArray = accounts as string[]
-        if (addressArray.length === 0) {
-          // User disconnected their wallet
-          setWalletConnected(false)
-          setWalletAddress("")
-          toast({
-            title: "Wallet Disconnected",
-            description: "Your wallet connection was lost",
-          })
-        } else {
-          // User switched accounts
-          setWalletAddress(addressArray[0])
-          toast({
-            title: "Account Changed",
-            description: `Switched to ${addressArray[0].slice(0, 6)}...${addressArray[0].slice(-4)}`,
-          })
+        if (Array.isArray(accounts)) {
+          if (accounts.length === 0) {
+            // User disconnected their wallet
+            setWalletConnected(false)
+            setWalletAddress("")
+            toast({
+              title: "Wallet Disconnected",
+              description: "Your wallet connection was lost",
+            })
+          } else {
+            // User switched accounts
+            setWalletAddress(accounts[0])
+            toast({
+              title: "Account Changed",
+              description: `Switched to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+            })
+          }
         }
       }
 
-      window.ethereum.on("accountsChanged", handleAccountsChanged)
+      // Use the standard 'on' method instead of 'addListener'
+      try {
+        window.ethereum.on("accountsChanged", handleAccountsChanged)
 
-      // Clean up the event listener when component unmounts
-      return () => {
-        if (window.ethereum) {
-          window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
+        // Clean up the event listener when component unmounts
+        return () => {
+          if (window.ethereum && typeof window.ethereum.removeListener === "function") {
+            window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
+          }
+        }
+      } catch (error) {
+        console.error("Error setting up MetaMask event listeners:", error)
+      }
+    }
+  }, [])
+
+  // Add this function to help with CSP compliance for dynamic behavior
+  const executeAction = (actionType: string, ...args: any[]): void => {
+    // Instead of using eval or new Function, use a predefined map of functions
+    const actions: Record<string, (...args: any[]) => void> = {
+      connectWallet: () => connectWallet(),
+      disconnectWallet: () => disconnectWallet(),
+      navigate: (path: string) => navigate(path),
+      // Add other actions as needed
+    }
+
+    if (actionType in actions) {
+      actions[actionType](...args)
+    } else {
+      console.error(`Action "${actionType}" not found`)
+    }
+  }
+
+  // Add this to the useEffect that checks for MetaMask
+  useEffect(() => {
+    // Check if MetaMask is installed
+    const checkForMetaMask = async () => {
+      if (window.ethereum) {
+        // Check if we're already connected
+        try {
+          // ❌ AVOID: Using string-based evaluation for handling responses
+          // ✅ CORRECT: Use proper async/await and function references
+          const accounts = await window.ethereum.request({ method: "eth_accounts" })
+          if (accounts && accounts.length > 0) {
+            setWalletAddress(accounts[0])
+            setWalletConnected(true)
+
+            toast({
+              title: "Wallet Connected",
+              description: `Already connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+            })
+          }
+        } catch (error) {
+          console.error("Error checking existing connection:", error)
         }
       }
     }
+
+    checkForMetaMask()
   }, [])
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
       <ParticleField />
-
       {/* Dynamic Cursor Effect */}
       <div
         className="fixed w-64 h-64 pointer-events-none z-50 transition-transform duration-100"
@@ -584,7 +709,6 @@ const HomePage: React.FC = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
       </div>
-
       {/* Enhanced Navigation */}
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-1000 
@@ -657,7 +781,6 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </nav>
-
       {/* Hero Section */}
       <main className="relative pt-32 pb-20 px-6" id="home">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -695,7 +818,7 @@ const HomePage: React.FC = () => {
             )}
 
             <div className="flex flex-wrap gap-4">
-              <a href="#learn">
+              <a href="/auth">
                 <button className="group relative px-8 py-4 rounded-xl overflow-hidden cursor-pointer">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600" />
                   <div
@@ -709,7 +832,7 @@ const HomePage: React.FC = () => {
                 </button>
               </a>
 
-              <a href="#explore">
+              <a href="/on-boarding">
                 <button className="group relative px-8 py-4 rounded-xl overflow-hidden cursor-pointer">
                   <div className="absolute inset-0 border border-purple-500 rounded-xl" />
                   <div
@@ -720,7 +843,7 @@ const HomePage: React.FC = () => {
                 </button>
               </a>
 
-              <a href="#about">
+              <a href="/about">
                 <button className="group relative px-8 py-4 rounded-xl overflow-hidden cursor-pointer">
                   <div className="absolute inset-0 bg-black/40 border border-purple-500/30 rounded-xl" />
                   <span className="relative z-10">Learn More</span>
@@ -763,12 +886,14 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </main>
-
       {/* What is Blockchain Section */}
+      <section className="py-20 px-6 relative" id="learn">
+        <div className="max-w-7xl mx-auto"></div>
+      </section>
       <section className="py-20 px-6 relative" id="learn">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <h2 className="text-3xll md:text-4xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               What is Blockchain?
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -800,8 +925,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* User Types Section */}
+      ;
       <section className="py-20 px-6 relative" id="explore">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
@@ -847,8 +971,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Success Stories / Blockchain Use Cases */}
+      ;
       <section className="py-20 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -886,8 +1009,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Testimonials */}
+      ;
       <section className="py-20 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
@@ -908,8 +1030,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Call to Action */}
+      ;
       <section className="py-20 px-6 relative">
         <div className="max-w-4xl mx-auto text-center">
           <div className="relative overflow-hidden rounded-3xl p-12">
@@ -962,9 +1083,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-6 relative" id="about">
+      <section className="py-12 px-6 relative" id="about">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-900/10 to-blue-900/10 backdrop-blur-sm" />
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -1014,7 +1133,7 @@ const HomePage: React.FC = () => {
               <h3 className="text-white font-semibold mb-4">Company</h3>
               <ul className="space-y-2">
                 <li>
-                  <a href="#about-us" className="text-gray-400 hover:text-gray-300 transition-colors cursor-pointer">
+                  <a href="/about-us" className="text-gray-400 hover:text-gray-300 transition-colors cursor-pointer">
                     About Us
                   </a>
                 </li>
@@ -1087,16 +1206,14 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
-      </footer>
-
-      {/* Toast Messages */}
+      </section>
+      ;
       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
         {toasts.map((toast, index) => (
           <Toast key={index} title={toast.title} description={toast.description} />
         ))}
       </div>
-      {/* Add this just before the final closing div */}
-      <WalletSelectionModal />
+      ;<WalletSelectionModal />
     </div>
   )
 }

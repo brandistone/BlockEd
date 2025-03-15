@@ -9,6 +9,8 @@ import HomePage from './Pages/home';
 import KidsPage from './Pages/KidsPage';
 import DevelopersPage from './Pages/DevelopersPage';
 import BeginnersPage from './Pages/BeginnersPage';
+import AuthPage from './Pages/AuthPage';
+import OnboardingPage from './Pages/OnboardingPage';
 
 const router = createBrowserRouter([
  
@@ -29,7 +31,17 @@ const router = createBrowserRouter([
   {
     path: "/beginners",
     element: <BeginnersPage />
+  },
+
+  {
+    path: "/auth",
+    element: <AuthPage />
+  },
+  {
+    path: "/on-boarding",
+    element: <OnboardingPage />
   }
+
 
 
 
