@@ -60,4 +60,4 @@ Want to improve BlockEd? Contributions are welcome! Fork the repo, create a bran
 📧 Email: info@blocked.com
 📢 Twitter: @BlockEd
 
-_🌐Understanding BlockChain, one block at time🚀_
+_🌐Understanding the Chain, one Block at time🚀_
