@@ -1,6 +1,6 @@
-### BlockEd: A Blockchain Education Platform
+## BlockEd: A Blockchain Education Platform
 
-#### 🚀 Introduction
+### 🚀 Introduction
 
 **BlockEd** is an interactive and decentralized learning platform designed to introduce users of all levels to blockchain technology. The platform offers structured courses and hands-on experiences to help:
 
@@ -12,7 +12,7 @@
 
 The app is built on EduChain (Solidity), ensuring decentralized, transparent, and immutable learning records.
 
-#### 🌟 Features
+### 🌟 Features
 
 **✅ Blockchain Basics** – Interactive lessons for beginners.
 
@@ -26,7 +26,7 @@ The app is built on EduChain (Solidity), ensuring decentralized, transparent, an
 
 **✅ Web3 Wallet Integration** – Users connect with MetaMask or EduChain wallet.
 
-## 🛠️ Tech Stack
+### 🛠️ Tech Stack
 
 Frontend: TypeScript, Tailwind CSS
 Backend: Solidity (EduChain smart contracts)
@@ -34,7 +34,7 @@ Storage: IPFS (off-chain data)
 Blockchain Interaction: ethers.js, web3.js
 Deployment: REMIX IDE
 
-#### 📂 Project Structure
+### 📂 Project Structure
 
 web3learn/
 │── frontend/ # React-based user interface
