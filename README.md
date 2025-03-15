@@ -22,16 +22,16 @@ The app is built on EduChain (Solidity), ensuring decentralized, transparent, an
 
 **✅ On-Chain Certificates** – NFT-based certificates for course completion.
 
-**✅ Decentralized Storage** – Learning content and progress stored securely using IPFS.
+**✅ Decentralized Storage** – Learning content and progress stored securely using EVMS.
 
-**✅ Web3 Wallet Integration** – Users connect with MetaMask or EduChain wallet.
+**✅ Web3 Wallet Integration** – Users connect with MetaMask wallet.
 
 ### 🛠️ Tech Stack
 
 - Frontend: TypeScript, Tailwind CSS
 - Backend: Solidity (EduChain smart contracts)
-- Storage: Solidity (on-chain data)
-- Blockchain Interaction: ethers.js, web3.js
+- Storage: EVM (on-chain data)
+- Blockchain Interaction: REMIX
 - Deployment: REMIX IDE (localhost)
 
 ### 🚀 Deployment
@@ -60,4 +60,4 @@ Want to improve BlockEd? Contributions are welcome! Fork the repo, create a bran
 📧 Email: info@blocked.com
 📢 Twitter: @BlockEd
 
-_🌐Web3 Education, one block at time🚀_
+_🌐Understanding BlockChain, one block at time🚀_
