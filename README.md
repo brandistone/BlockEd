@@ -28,47 +28,19 @@ The app is built on EduChain (Solidity), ensuring decentralized, transparent, an
 
 ### 🛠️ Tech Stack
 
-Frontend: TypeScript, Tailwind CSS
-Backend: Solidity (EduChain smart contracts)
-Storage: IPFS (off-chain data)
-Blockchain Interaction: ethers.js, web3.js
-Deployment: REMIX IDE
+- Frontend: TypeScript, Tailwind CSS
+- Backend: Solidity (EduChain smart contracts)
+- Storage: Solidity (on-chain data)
+- Blockchain Interaction: ethers.js, web3.js
+- Deployment: REMIX IDE (localhost)
 
-### 📂 Project Structure
+### 🚀 Deployment
 
-web3learn/
-│── frontend/ # React-based user interface
-│ ├── src/
-│ │ ├── components/ # UI components
-│ │ ├── pages/ # App pages (Dashboard, Courses, etc.)
-│ │ ├── utils/ # Blockchain interaction (ethers.js)
-│ ├── public/ # Static assets
-│ ├── package.json # Frontend dependencies
-│
-│── contracts/ # Solidity smart contracts
-│ ├── LearnBlockchain.sol # User progress & rewards contract
-│ ├── NFTCertificate.sol # NFT-based learning certificates
-│ ├── deploy.js # Deployment script
-│
-│── backend/ # Off-chain API (if needed)
-│ ├── server.js # Express.js backend (optional)
-│
-│── scripts/ # Smart contract interaction scripts
-│── hardhat.config.js # Hardhat setup
-│── README.md # Project documentation
+Deploy Smart Contracts to EduChain.
 
-#### 🚀 Deployment
+Currently running on localhost.
 
-Deploy Smart Contracts to EduChain
-
-npx hardhat run scripts/deploy.js --network educhain
-
-Deploy Frontend to Vercel
-
-npm run build
-vercel --prod
-
-#### 📌 Future Enhancements
+### 📌 Future Enhancements
 
 🎮 Interactive Quizzes – Engage learners through challenges.
 
@@ -78,14 +50,14 @@ vercel --prod
 
 💰 EduChain Token Rewards – Incentivize learning.
 
-🤝 Contributing
+### 🤝 Contributing
 
 Want to improve BlockEd? Contributions are welcome! Fork the repo, create a branch, and submit a PR.
 
-📞 Contact & Support
+### 📞 Contact & Support
 
 💡 Website: [Coming Soon]
 📧 Email: info@blocked.com
 📢 Twitter: @BlockEd
 
-🌐Web3 Education, one block at time🚀
+_🌐Web3 Education, one block at time🚀_
