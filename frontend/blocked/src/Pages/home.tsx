@@ -16,7 +16,6 @@ import {
   Code,
   User,
   Lightbulb,
-  MessageSquare,
   Shield,
 } from "lucide-react"
 
@@ -55,13 +54,13 @@ interface AnimatedCardProps {
   isSelected: boolean
 }
 
-interface TestimonialProps {
-  quote: string
-  author: string
-  role: string
-  image: string
-  delay?: number
-}
+// interface TestimonialProps {
+//   quote: string
+//   author: string
+//   role: string
+//   image: string
+//   delay?: number
+// }
 
 interface UserType {
   icon: React.ReactNode
@@ -72,12 +71,12 @@ interface UserType {
   path: string
 }
 
-interface Testimonial {
-  quote: string
-  author: string
-  role: string
-  image: string
-}
+// interface Testimonial {
+//   quote: string
+//   author: string
+//   role: string
+//   image: string
+// }
 
 interface SuccessStory {
   icon: React.ReactNode
@@ -207,33 +206,33 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({ children, delay, onClick, i
 }
 
 // Testimonial component
-const Testimonial: React.FC<TestimonialProps> = ({ quote, author, role, image, delay = 0 }) => {
-  return (
-    <div
-      className="relative opacity-0 animate-fade-in"
-      style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-xl blur-lg" />
-      <div className="relative bg-black/30 backdrop-blur-md rounded-xl border border-purple-500/20 p-6">
-        <div className="flex flex-col h-full">
-          <div className="mb-4">
-            <MessageSquare className="w-8 h-8 text-purple-400 opacity-50" />
-          </div>
-          <p className="text-gray-300 italic mb-6">{quote}</p>
-          <div className="mt-auto flex items-center">
-            <div className="w-12 h-12 rounded-full overflow-hidden mr-4 bg-gradient-to-r from-purple-500 to-blue-500 p-0.5">
-              <img src={image || "/placeholder.svg"} alt={author} className="w-full h-full rounded-full object-cover" />
-            </div>
-            <div>
-              <h4 className="font-medium text-white">{author}</h4>
-              <p className="text-sm text-gray-400">{role}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+// const Testimonial: React.FC<TestimonialProps> = ({ quote, author, role, image, delay = 0 }) => {
+//   return (
+//     <div
+//       className="relative opacity-0 animate-fade-in"
+//       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
+//     >
+//       <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-xl blur-lg" />
+//       <div className="relative bg-black/30 backdrop-blur-md rounded-xl border border-purple-500/20 p-6">
+//         <div className="flex flex-col h-full">
+//           <div className="mb-4">
+//             <MessageSquare className="w-8 h-8 text-purple-400 opacity-50" />
+//           </div>
+//           <p className="text-gray-300 italic mb-6">{quote}</p>
+//           <div className="mt-auto flex items-center">
+//             <div className="w-12 h-12 rounded-full overflow-hidden mr-4 bg-gradient-to-r from-purple-500 to-blue-500 p-0.5">
+//               <img src={image || "/placeholder.svg"} alt={author} className="w-full h-full rounded-full object-cover" />
+//             </div>
+//             <div>
+//               <h4 className="font-medium text-white">{author}</h4>
+//               <p className="text-sm text-gray-400">{role}</p>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate()
@@ -244,7 +243,7 @@ const HomePage: React.FC = () => {
   const [walletConnected, setWalletConnected] = useState<boolean>(false)
   const [isConnecting, setIsConnecting] = useState<boolean>(false)
   const [walletAddress, setWalletAddress] = useState<string>("")
-  const [ocid, setOcid] = useState<string>("")
+  // const [ocid, setOcid] = useState<string>("")
   const [showWalletModal, setShowWalletModal] = useState<boolean>(false)
 
   useEffect(() => {
@@ -255,16 +254,16 @@ const HomePage: React.FC = () => {
     window.addEventListener("mousemove", handleMouseMove)
 
     // Generate a random OCID (Blockchain Open Content ID)
-    const generateRandomOcid = () => {
-      const characters = "0123456789abcdef"
-      let result = "0x"
-      for (let i = 0; i < 40; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length))
-      }
-      setOcid(result)
-    }
+    // const generateRandomOcid = () => {
+    //   const characters = "0123456789abcdef"
+    //   let result = "0x"
+    //   for (let i = 0; i < 40; i++) {
+    //     result += characters.charAt(Math.floor(Math.random() * characters.length))
+    //   }
+    //   setOcid(result)
+    // }
 
-    generateRandomOcid()
+    // generateRandomOcid()
 
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
@@ -296,27 +295,27 @@ const HomePage: React.FC = () => {
     },
   ]
 
-  const testimonials: Testimonial[] = [
-    {
-      quote: "This platform made blockchain concepts so easy to understand. I finally get what all the hype is about!",
-      author: "Sarah Johnson",
-      role: "Marketing Professional",
-      image: "/placeholder.svg?height=100&width=100",
-    },
-    {
-      quote: "My 10-year-old is obsessed with the games. She's learning about blockchain without even realizing it!",
-      author: "Michael Chen",
-      role: "Parent",
-      image: "/placeholder.svg?height=100&width=100",
-    },
-    {
-      quote:
-        "The developer resources helped me build my first dApp. The step-by-step tutorials are incredibly valuable.",
-      author: "Alex Rodriguez",
-      role: "Software Engineer",
-      image: "/placeholder.svg?height=100&width=100",
-    },
-  ]
+  // const testimonials: Testimonial[] = [
+  //   {
+  //     quote: "This platform made blockchain concepts so easy to understand. I finally get what all the hype is about!",
+  //     author: "Sarah Johnson",
+  //     role: "Marketing Professional",
+  //     image: "/placeholder.svg?height=100&width=100",
+  //   },
+  //   {
+  //     quote: "My 10-year-old is obsessed with the games. She's learning about blockchain without even realizing it!",
+  //     author: "Michael Chen",
+  //     role: "Parent",
+  //     image: "/placeholder.svg?height=100&width=100",
+  //   },
+  //   {
+  //     quote:
+  //       "The developer resources helped me build my first dApp. The step-by-step tutorials are incredibly valuable.",
+  //     author: "Alex Rodriguez",
+  //     role: "Software Engineer",
+  //     image: "/placeholder.svg?height=100&width=100",
+  //   },
+  // ]
 
   const features: Feature[] = [
     {
@@ -372,6 +371,11 @@ const HomePage: React.FC = () => {
     setIsConnecting(true)
 
     try {
+      // Check if we're in a browser environment
+      if (typeof window === "undefined") {
+        throw new Error("Cannot connect wallet in server-side rendering context")
+      }
+
       // Check if EduChain wallet is available first (prioritize it)
       if (window.eduChainWallet) {
         try {
@@ -426,7 +430,7 @@ const HomePage: React.FC = () => {
             })
             setShowWalletModal(true)
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("MetaMask connection error:", error)
 
           // Handle specific MetaMask errors
@@ -472,7 +476,7 @@ const HomePage: React.FC = () => {
   const disconnectWallet = async (): Promise<void> => {
     try {
       // If using EduChain wallet
-      if (window.eduChainWallet) {
+      if (typeof window !== "undefined" && window.eduChainWallet) {
         await window.eduChainWallet.disconnect()
       }
 
@@ -496,9 +500,6 @@ const HomePage: React.FC = () => {
   const createEducationalNFT = (): void => {
     // This would interact with a smart contract in a real implementation
     // Here we're just simulating the NFT creation
-
-    // ❌ AVOID: setTimeout("toast({...})", 3000)
-    // ✅ CORRECT: Use function reference
     setTimeout(() => {
       toast({
         title: "Welcome NFT Minted!",
@@ -513,14 +514,14 @@ const HomePage: React.FC = () => {
     const selectedType = userTypes[index]
 
     // Navigate to the corresponding page
-    // ❌ AVOID: setTimeout("navigate(selectedType.path)", 500)
-    // ✅ CORRECT: Use function reference
     setTimeout(() => {
       navigate(selectedType.path)
     }, 500)
   }
 
   const checkMetaMaskInstallation = (): boolean => {
+    if (typeof window === "undefined") return false
+
     if (!window.ethereum) {
       toast({
         title: "MetaMask Not Installed",
@@ -562,7 +563,7 @@ const HomePage: React.FC = () => {
             >
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center mr-3">
-                  <span className="text-white font-bold">E</span>
+                  <span className="text-white font-bold">B</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-white">EduChain Wallet</h4>
@@ -574,7 +575,7 @@ const HomePage: React.FC = () => {
 
             <button
               onClick={() => {
-                if (window.ethereum && window.ethereum.isMetaMask) {
+                if (typeof window !== "undefined" && window.ethereum && window.ethereum.isMetaMask) {
                   connectWallet()
                 } else {
                   window.open("https://metamask.io/download/", "_blank")
@@ -590,7 +591,7 @@ const HomePage: React.FC = () => {
                 <div>
                   <h4 className="font-medium text-white">MetaMask</h4>
                   <p className="text-xs text-gray-400">
-                    {window.ethereum && window.ethereum.isMetaMask
+                    {typeof window !== "undefined" && window.ethereum && window.ethereum.isMetaMask
                       ? "Connect using MetaMask wallet"
                       : "Install MetaMask wallet"}
                   </p>
@@ -614,7 +615,7 @@ const HomePage: React.FC = () => {
   // Add this with the other useEffect hooks
   useEffect(() => {
     // Listen for account changes
-    if (window.ethereum) {
+    if (typeof window !== "undefined" && window.ethereum) {
       const handleAccountsChanged = (accounts: unknown) => {
         if (Array.isArray(accounts)) {
           if (accounts.length === 0) {
@@ -652,32 +653,13 @@ const HomePage: React.FC = () => {
     }
   }, [])
 
-  // Add this function to help with CSP compliance for dynamic behavior
-  const executeAction = (actionType: string, ...args: any[]): void => {
-    // Instead of using eval or new Function, use a predefined map of functions
-    const actions: Record<string, (...args: any[]) => void> = {
-      connectWallet: () => connectWallet(),
-      disconnectWallet: () => disconnectWallet(),
-      navigate: (path: string) => navigate(path),
-      // Add other actions as needed
-    }
-
-    if (actionType in actions) {
-      actions[actionType](...args)
-    } else {
-      console.error(`Action "${actionType}" not found`)
-    }
-  }
-
   // Add this to the useEffect that checks for MetaMask
   useEffect(() => {
     // Check if MetaMask is installed
     const checkForMetaMask = async () => {
-      if (window.ethereum) {
+      if (typeof window !== "undefined" && window.ethereum) {
         // Check if we're already connected
         try {
-          // ❌ AVOID: Using string-based evaluation for handling responses
-          // ✅ CORRECT: Use proper async/await and function references
           const accounts = await window.ethereum.request({ method: "eth_accounts" })
           if (accounts && accounts.length > 0) {
             setWalletAddress(accounts[0])
@@ -726,7 +708,7 @@ const HomePage: React.FC = () => {
                   />
                   <div className="absolute inset-1 bg-black rounded-lg" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold">E</span>
+                    <span className="text-2xl font-bold">B</span>
                   </div>
                 </div>
                 <span
@@ -734,7 +716,7 @@ const HomePage: React.FC = () => {
                   from-purple-400 to-blue-400 group-hover:from-purple-300 group-hover:to-blue-300 
                   transition-all duration-300"
                 >
-                  EduChain
+                  BlockEd
                 </span>
               </div>
 
@@ -790,17 +772,17 @@ const HomePage: React.FC = () => {
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
               <div className="overflow-hidden">
-                <span className="inline-block animate-slide-up-fade">Understand</span>
+                <span className="inline-block animate-slide-up-fade">Understanding</span>
               </div>
               <div className="overflow-hidden">
-                <span className="inline-block animate-slide-up-fade delay-200">Blockchain</span>
+                <span className="inline-block animate-slide-up-fade delay-200">The Chain</span>
               </div>
               <div className="overflow-hidden">
                 <span
                   className="inline-block bg-gradient-to-r from-purple-400 to-blue-400 
                   bg-clip-text text-transparent animate-slide-up-fade delay-400"
                 >
-                  Made Simple
+                  One Block At A Time
                 </span>
               </div>
             </h1>
@@ -810,12 +792,12 @@ const HomePage: React.FC = () => {
               reshaping our digital future.
             </p>
 
-            {ocid && (
+            {/* {ocid && (
               <div className="mb-8 bg-black/40 backdrop-blur-md border border-purple-500/30 rounded-xl p-4">
                 <p className="text-sm text-purple-300">EduChain Blockchain OCID:</p>
                 <p className="text-xs text-gray-400 font-mono">{ocid}</p>
               </div>
-            )}
+            )} */}
 
             <div className="flex flex-wrap gap-4">
               <a href="/auth">
@@ -839,7 +821,7 @@ const HomePage: React.FC = () => {
                     className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 
                     transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
                   />
-                  <span className="relative z-10">Explore</span>
+                  <span className="relative z-10">Demo</span>
                 </button>
               </a>
 
@@ -925,7 +907,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-      ;
+
       <section className="py-20 px-6 relative" id="explore">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
@@ -958,7 +940,10 @@ const HomePage: React.FC = () => {
                   </p>
                   <div className="mt-auto">
                     <button
-                      onClick={() => navigate(userType.path)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(userType.path)
+                      }}
                       className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600/20 to-blue-600/20 
                       border border-purple-500/30 hover:border-purple-500/50 text-white transition-all duration-300 cursor-pointer"
                     >
@@ -971,7 +956,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-      ;
+
       <section className="py-20 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -1009,28 +994,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-      ;
-      <section className="py-20 px-6 relative">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            What Our Users Say
-          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Testimonial
-                key={index}
-                quote={testimonial.quote}
-                author={testimonial.author}
-                role={testimonial.role}
-                image={testimonial.image}
-                delay={index * 300}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-      ;
       <section className="py-20 px-6 relative">
         <div className="max-w-4xl mx-auto text-center">
           <div className="relative overflow-hidden rounded-3xl p-12">
@@ -1046,7 +1010,7 @@ const HomePage: React.FC = () => {
                 beginner, a kid, or a developer, we have resources for you.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <a href="#learn">
+                <a href="/learn">
                   <button className="group relative px-10 py-5 rounded-xl overflow-hidden cursor-pointer">
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600" />
                     <div
@@ -1093,11 +1057,11 @@ const HomePage: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl" />
                   <div className="absolute inset-1 bg-black rounded-lg" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold">E</span>
+                    <span className="text-xl font-bold">B</span>
                   </div>
                 </div>
                 <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                  EduChain
+                  BlockEd
                 </span>
               </div>
               <p className="text-gray-400 text-sm">Making blockchain education accessible for everyone.</p>
@@ -1207,13 +1171,13 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-      ;
+
       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
         {toasts.map((toast, index) => (
           <Toast key={index} title={toast.title} description={toast.description} />
         ))}
       </div>
-      ;<WalletSelectionModal />
+      <WalletSelectionModal />
     </div>
   )
 }
