@@ -187,7 +187,7 @@ const OnboardingPage: React.FC = () => {
   // Define the steps content
   const steps = [
     {
-      title: "Welcome to Blockchain Adventures!",
+      title: "Welcome to BlockEd!",
       icon: <Sparkles className="w-6 h-6 text-white" />,
       image: "/placeholder.svg?height=200&width=500",
       description: (

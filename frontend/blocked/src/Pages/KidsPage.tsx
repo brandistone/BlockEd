@@ -322,7 +322,7 @@ const KidsPage: React.FC = () => {
   const [points, setPoints] = useState(0)
   const [selectedCharacter, setSelectedCharacter] = useState(0)
   const [showCharacterSelection, setShowCharacterSelection] = useState(false)
-  const [ocid, setOcid] = useState<string>("")
+  // const [ocid, setOcid] = useState<string>("")
   const { toast } = useToast()
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
@@ -351,16 +351,16 @@ const KidsPage: React.FC = () => {
     }
 
     // Generate a random OCID for content tracking
-    const generateRandomOcid = () => {
-      const characters = "0123456789abcdef"
-      let result = "0x"
-      for (let i = 0; i < 40; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length))
-      }
-      setOcid(result)
-    }
+    // const generateRandomOcid = () => {
+    //   const characters = "0123456789abcdef"
+    //   let result = "0x"
+    //   for (let i = 0; i < 40; i++) {
+    //     result += characters.charAt(Math.floor(Math.random() * characters.length))
+    //   }
+    //   setOcid(result)
+    // }
 
-    generateRandomOcid()
+    // generateRandomOcid()
 
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
@@ -582,7 +582,7 @@ const KidsPage: React.FC = () => {
               </div>
             </div>
           </div>
-
+{/* 
           {ocid && (
             <div className="mb-6 inline-block bg-[#120A38]/60 backdrop-blur-md border border-purple-700/30 rounded-xl p-3">
               <p className="text-xs text-purple-200">
@@ -592,7 +592,7 @@ const KidsPage: React.FC = () => {
                 </span>
               </p>
             </div>
-          )}
+          )} */}
 
           {completedGames.length > 0 && (
             <div className="bg-[#120A38]/60 backdrop-blur-md rounded-xl p-4 border border-purple-700/30 mb-8 inline-block">
