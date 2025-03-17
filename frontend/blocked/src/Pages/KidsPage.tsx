@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+// import { useNavigate } from "react-router-dom"
 import { ArrowRight, Star, Trophy, Gift, Lock, CheckCircle, Sparkles, Zap, Lightbulb, Shield } from "lucide-react"
 
 // Custom Toast Implementation
@@ -316,7 +316,7 @@ import BlockchainConnect from "../components/BlockchainConnect"
 
 // Main Page Component
 const KidsPage: React.FC = () => {
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const [activeGame, setActiveGame] = useState<number | null>(null)
   const [completedGames, setCompletedGames] = useState<number[]>([])
   const [points, setPoints] = useState(0)
