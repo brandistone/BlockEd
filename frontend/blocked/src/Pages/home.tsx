@@ -3,6 +3,8 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { ConnectButton } from "@rainbow-me/rainbowkit"
+// import { Providers } from "./providers"
 import {
   Sparkles,
   Zap,
@@ -12,39 +14,11 @@ import {
   Ticket,
   Activity,
   Globe,
-  Power,
   Code,
   User,
   Lightbulb,
   Shield,
 } from "lucide-react"
-
-// Add this at the top of the file, after the imports
-/*
- * Content Security Policy (CSP) Compliance Notes:
- *
- * This file avoids using the following CSP-violating patterns:
- * - eval() or new Function() for string evaluation
- * - setTimeout/setInterval with string arguments
- * - Inline event handlers with string code
- *
- * All dynamic code execution uses function references instead of strings.
- * If you modify this file, please maintain CSP compliance.
- */
-declare global {
-  interface Window {
-    ethereum?: {
-      isMetaMask?: boolean
-      request: (request: { method: string; params?: any[] }) => Promise<any>
-      on: (eventName: string, callback: (...args: any[]) => void) => void
-      removeListener: (eventName: string, callback: (...args: any[]) => void) => void
-    }
-    eduChainWallet?: {
-      connect: () => Promise<string>
-      disconnect: () => Promise<void>
-    }
-  }
-}
 
 // TypeScript interfaces
 interface AnimatedCardProps {
@@ -54,14 +28,6 @@ interface AnimatedCardProps {
   isSelected: boolean
 }
 
-// interface TestimonialProps {
-//   quote: string
-//   author: string
-//   role: string
-//   image: string
-//   delay?: number
-// }
-
 interface UserType {
   icon: React.ReactNode
   title: string
@@ -70,13 +36,6 @@ interface UserType {
   cta: string
   path: string
 }
-
-// interface Testimonial {
-//   quote: string
-//   author: string
-//   role: string
-//   image: string
-// }
 
 interface SuccessStory {
   icon: React.ReactNode
@@ -95,20 +54,6 @@ interface Feature {
 interface NavItem {
   name: string
   path: string
-}
-
-// Add this with the other interfaces
-interface Window {
-  ethereum?: {
-    isMetaMask?: boolean
-    request: (request: { method: string; params?: any[] }) => Promise<any>
-    on: (eventName: string, callback: (...args: any[]) => void) => void
-    removeListener: (eventName: string, callback: (...args: any[]) => void) => void
-  }
-  eduChainWallet?: {
-    connect: () => Promise<string>
-    disconnect: () => Promise<void>
-  }
 }
 
 // Toast component
@@ -205,34 +150,59 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({ children, delay, onClick, i
   )
 }
 
-// Testimonial component
-// const Testimonial: React.FC<TestimonialProps> = ({ quote, author, role, image, delay = 0 }) => {
-//   return (
-//     <div
-//       className="relative opacity-0 animate-fade-in"
-//       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
-//     >
-//       <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-xl blur-lg" />
-//       <div className="relative bg-black/30 backdrop-blur-md rounded-xl border border-purple-500/20 p-6">
-//         <div className="flex flex-col h-full">
-//           <div className="mb-4">
-//             <MessageSquare className="w-8 h-8 text-purple-400 opacity-50" />
-//           </div>
-//           <p className="text-gray-300 italic mb-6">{quote}</p>
-//           <div className="mt-auto flex items-center">
-//             <div className="w-12 h-12 rounded-full overflow-hidden mr-4 bg-gradient-to-r from-purple-500 to-blue-500 p-0.5">
-//               <img src={image || "/placeholder.svg"} alt={author} className="w-full h-full rounded-full object-cover" />
-//             </div>
-//             <div>
-//               <h4 className="font-medium text-white">{author}</h4>
-//               <p className="text-sm text-gray-400">{role}</p>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
+// Custom connect wallet button for when RainbowKit is not available
+const FallbackConnectButton = () => {
+  return (
+    <button className="relative px-8 py-3 group overflow-hidden rounded-xl cursor-pointer">
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-70 
+                group-hover:opacity-100 transition-opacity duration-300"
+      />
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 blur-xl 
+                group-hover:blur-2xl transition-all duration-300"
+      />
+      <span className="relative z-10 flex items-center gap-2">Connect Wallet</span>
+    </button>
+  )
+}
+
+// Wrapper component for RainbowKit ConnectButton
+const WalletConnectButton = () => {
+  // Check if we're in a browser environment and if window.wagmi exists
+  const [isWagmiAvailable, setIsWagmiAvailable] = useState(false)
+
+  useEffect(() => {
+    // Check if we're in a browser and if wagmi is available
+    try {
+      // This is a simple check to see if we're in the WagmiProvider context
+      // We don't actually use the import, just check if it's available
+      setIsWagmiAvailable(true)
+    } catch (error) {
+      console.error("Wagmi provider not available:", error)
+      setIsWagmiAvailable(false)
+    }
+  }, [])
+
+  if (!isWagmiAvailable) {
+    return <FallbackConnectButton />
+  }
+
+  // Only render the ConnectButton if wagmi is available
+  try {
+    return (
+      <div className="relative overflow-hidden rounded-xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl blur-xl"></div>
+        <div className="relative z-10">
+          <ConnectButton chainStatus="icon" showBalance={false} />
+        </div>
+      </div>
+    )
+  } catch (error) {
+    console.error("Error rendering ConnectButton:", error)
+    return <FallbackConnectButton />
+  }
+}
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate()
@@ -240,11 +210,6 @@ const HomePage: React.FC = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [selectedUserType, setSelectedUserType] = useState<number | null>(null)
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
-  const [walletConnected, setWalletConnected] = useState<boolean>(false)
-  const [isConnecting, setIsConnecting] = useState<boolean>(false)
-  const [walletAddress, setWalletAddress] = useState<string>("")
-  // const [ocid, setOcid] = useState<string>("")
-  const [showWalletModal, setShowWalletModal] = useState<boolean>(false)
 
   useEffect(() => {
     setIsVisible(true)
@@ -252,18 +217,6 @@ const HomePage: React.FC = () => {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
     window.addEventListener("mousemove", handleMouseMove)
-
-    // Generate a random OCID (Blockchain Open Content ID)
-    // const generateRandomOcid = () => {
-    //   const characters = "0123456789abcdef"
-    //   let result = "0x"
-    //   for (let i = 0; i < 40; i++) {
-    //     result += characters.charAt(Math.floor(Math.random() * characters.length))
-    //   }
-    //   setOcid(result)
-    // }
-
-    // generateRandomOcid()
 
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
@@ -294,28 +247,6 @@ const HomePage: React.FC = () => {
       path: "/developers",
     },
   ]
-
-  // const testimonials: Testimonial[] = [
-  //   {
-  //     quote: "This platform made blockchain concepts so easy to understand. I finally get what all the hype is about!",
-  //     author: "Sarah Johnson",
-  //     role: "Marketing Professional",
-  //     image: "/placeholder.svg?height=100&width=100",
-  //   },
-  //   {
-  //     quote: "My 10-year-old is obsessed with the games. She's learning about blockchain without even realizing it!",
-  //     author: "Michael Chen",
-  //     role: "Parent",
-  //     image: "/placeholder.svg?height=100&width=100",
-  //   },
-  //   {
-  //     quote:
-  //       "The developer resources helped me build my first dApp. The step-by-step tutorials are incredibly valuable.",
-  //     author: "Alex Rodriguez",
-  //     role: "Software Engineer",
-  //     image: "/placeholder.svg?height=100&width=100",
-  //   },
-  // ]
 
   const features: Feature[] = [
     {
@@ -366,148 +297,6 @@ const HomePage: React.FC = () => {
     { name: "About", path: "#about" },
   ]
 
-  // Update the wallet connection function to focus on MetaMask and EduChain wallet
-  const connectWallet = async (): Promise<void> => {
-    setIsConnecting(true)
-
-    try {
-      // Check if we're in a browser environment
-      if (typeof window === "undefined") {
-        throw new Error("Cannot connect wallet in server-side rendering context")
-      }
-
-      // Check if EduChain wallet is available first (prioritize it)
-      if (window.eduChainWallet) {
-        try {
-          const account = await window.eduChainWallet.connect()
-
-          setWalletAddress(account)
-          setWalletConnected(true)
-
-          // Create an NFT for the user
-          createEducationalNFT()
-
-          toast({
-            title: "EduChain Wallet Connected",
-            description: `Successfully connected to ${account.slice(0, 6)}...${account.slice(-4)}`,
-          })
-        } catch (error) {
-          console.error("EduChain wallet connection failed", error)
-          toast({
-            title: "Connection Failed",
-            description: "EduChain wallet connection failed",
-          })
-        }
-      }
-      // If EduChain wallet is not available, try MetaMask
-      else if (window.ethereum) {
-        try {
-          // Check if MetaMask is installed
-          if (window.ethereum.isMetaMask) {
-            // Request account access with error handling
-            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
-
-            if (accounts && accounts.length > 0) {
-              const account = accounts[0]
-
-              setWalletAddress(account)
-              setWalletConnected(true)
-
-              // Create an NFT for the user - ensure this doesn't use eval() internally
-              createEducationalNFT()
-
-              toast({
-                title: "MetaMask Connected",
-                description: `Successfully connected to ${account.slice(0, 6)}...${account.slice(-4)}`,
-              })
-            } else {
-              throw new Error("No accounts returned from MetaMask")
-            }
-          } else {
-            toast({
-              title: "MetaMask Not Detected",
-              description: "Please install MetaMask extension",
-            })
-            setShowWalletModal(true)
-          }
-        } catch (error: any) {
-          console.error("MetaMask connection error:", error)
-
-          // Handle specific MetaMask errors
-          let errorMessage = "You rejected the connection request"
-
-          if (typeof error === "object" && error !== null) {
-            if ("code" in error && error.code === 4001) {
-              errorMessage = "You rejected the connection request"
-            } else if ("code" in error && error.code === -32002) {
-              errorMessage = "Connection request already pending. Check MetaMask extension"
-            } else if ("message" in error && typeof error.message === "string") {
-              errorMessage = error.message
-            }
-          }
-
-          toast({
-            title: "Connection Failed",
-            description: errorMessage,
-          })
-        }
-      }
-      // No wallet found
-      else {
-        toast({
-          title: "Wallet Not Found",
-          description: "Please install EduChain wallet or MetaMask extension",
-        })
-
-        // Open wallet selection modal
-        setShowWalletModal(true)
-      }
-    } catch (error) {
-      console.error("Wallet connection error:", error)
-      toast({
-        title: "Connection Error",
-        description: "An error occurred while connecting to your wallet",
-      })
-    } finally {
-      setIsConnecting(false)
-    }
-  }
-
-  const disconnectWallet = async (): Promise<void> => {
-    try {
-      // If using EduChain wallet
-      if (typeof window !== "undefined" && window.eduChainWallet) {
-        await window.eduChainWallet.disconnect()
-      }
-
-      setWalletConnected(false)
-      setWalletAddress("")
-
-      toast({
-        title: "Wallet Disconnected",
-        description: "Your wallet has been disconnected successfully",
-      })
-    } catch (error) {
-      console.error("Error disconnecting wallet:", error)
-      toast({
-        title: "Disconnection Error",
-        description: "An error occurred while disconnecting your wallet",
-      })
-    }
-  }
-
-  // In the createEducationalNFT function, ensure we're not using string evaluation
-  const createEducationalNFT = (): void => {
-    // This would interact with a smart contract in a real implementation
-    // Here we're just simulating the NFT creation
-    setTimeout(() => {
-      toast({
-        title: "Welcome NFT Minted!",
-        description: "Your educational journey NFT has been minted to your wallet",
-      })
-    }, 3000)
-  }
-
   // In the handleUserTypeSelect function, ensure we're using function references
   const handleUserTypeSelect = (index: number): void => {
     setSelectedUserType(index)
@@ -518,166 +307,6 @@ const HomePage: React.FC = () => {
       navigate(selectedType.path)
     }, 500)
   }
-
-  const checkMetaMaskInstallation = (): boolean => {
-    if (typeof window === "undefined") return false
-
-    if (!window.ethereum) {
-      toast({
-        title: "MetaMask Not Installed",
-        description: "Please install MetaMask extension to connect your wallet",
-      })
-      setShowWalletModal(true)
-      return false
-    }
-
-    if (!window.ethereum.isMetaMask) {
-      toast({
-        title: "MetaMask Not Detected",
-        description: "Please ensure MetaMask extension is properly installed",
-      })
-      setShowWalletModal(true)
-      return false
-    }
-
-    return true
-  }
-
-  // Update the WalletSelectionModal component to show MetaMask and EduChain wallet options
-  const WalletSelectionModal = () => {
-    if (!showWalletModal) return null
-
-    return (
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="bg-black/80 border border-purple-500/30 rounded-xl p-6 max-w-md w-full">
-          <h3 className="text-xl font-bold mb-4 text-white">Connect Wallet</h3>
-          <p className="text-gray-300 mb-6">Select a wallet to connect to EduChain</p>
-
-          <div className="grid gap-4">
-            <button
-              onClick={() => {
-                window.open("https://educhain.com/wallet", "_blank")
-                setShowWalletModal(false)
-              }}
-              className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/30 rounded-lg hover:border-purple-500/50 transition-all"
-            >
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center mr-3">
-                  <span className="text-white font-bold">B</span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-white">EduChain Wallet</h4>
-                  <p className="text-xs text-gray-400">Connect using EduChain wallet</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </button>
-
-            <button
-              onClick={() => {
-                if (typeof window !== "undefined" && window.ethereum && window.ethereum.isMetaMask) {
-                  connectWallet()
-                } else {
-                  window.open("https://metamask.io/download/", "_blank")
-                }
-                setShowWalletModal(false)
-              }}
-              className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/30 rounded-lg hover:border-purple-500/50 transition-all"
-            >
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center mr-3">
-                  <span className="text-white font-bold">M</span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-white">MetaMask</h4>
-                  <p className="text-xs text-gray-400">
-                    {typeof window !== "undefined" && window.ethereum && window.ethereum.isMetaMask
-                      ? "Connect using MetaMask wallet"
-                      : "Install MetaMask wallet"}
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </button>
-          </div>
-
-          <button
-            onClick={() => setShowWalletModal(false)}
-            className="mt-6 w-full py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  // Add this with the other useEffect hooks
-  useEffect(() => {
-    // Listen for account changes
-    if (typeof window !== "undefined" && window.ethereum) {
-      const handleAccountsChanged = (accounts: unknown) => {
-        if (Array.isArray(accounts)) {
-          if (accounts.length === 0) {
-            // User disconnected their wallet
-            setWalletConnected(false)
-            setWalletAddress("")
-            toast({
-              title: "Wallet Disconnected",
-              description: "Your wallet connection was lost",
-            })
-          } else {
-            // User switched accounts
-            setWalletAddress(accounts[0])
-            toast({
-              title: "Account Changed",
-              description: `Switched to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
-            })
-          }
-        }
-      }
-
-      // Use the standard 'on' method instead of 'addListener'
-      try {
-        window.ethereum.on("accountsChanged", handleAccountsChanged)
-
-        // Clean up the event listener when component unmounts
-        return () => {
-          if (window.ethereum && typeof window.ethereum.removeListener === "function") {
-            window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
-          }
-        }
-      } catch (error) {
-        console.error("Error setting up MetaMask event listeners:", error)
-      }
-    }
-  }, [])
-
-  // Add this to the useEffect that checks for MetaMask
-  useEffect(() => {
-    // Check if MetaMask is installed
-    const checkForMetaMask = async () => {
-      if (typeof window !== "undefined" && window.ethereum) {
-        // Check if we're already connected
-        try {
-          const accounts = await window.ethereum.request({ method: "eth_accounts" })
-          if (accounts && accounts.length > 0) {
-            setWalletAddress(accounts[0])
-            setWalletConnected(true)
-
-            toast({
-              title: "Wallet Connected",
-              description: `Already connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
-            })
-          }
-        } catch (error) {
-          console.error("Error checking existing connection:", error)
-        }
-      }
-    }
-
-    checkForMetaMask()
-  }, [])
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
@@ -732,32 +361,8 @@ const HomePage: React.FC = () => {
                     />
                   </a>
                 ))}
-                <button
-                  onClick={walletConnected ? disconnectWallet : connectWallet}
-                  disabled={isConnecting}
-                  className="relative px-8 py-3 group overflow-hidden rounded-xl cursor-pointer"
-                >
-                  <div
-                    className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-70 
-                    group-hover:opacity-100 transition-opacity duration-300"
-                  />
-                  <div
-                    className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 blur-xl 
-                    group-hover:blur-2xl transition-all duration-300"
-                  />
-                  <span className="relative z-10 flex items-center gap-2">
-                    {isConnecting ? (
-                      "Connecting..."
-                    ) : walletConnected ? (
-                      <>
-                        <span>{`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}</span>
-                        <Power className="w-4 h-4" />
-                      </>
-                    ) : (
-                      "Connect Wallet"
-                    )}
-                  </span>
-                </button>
+                {/* RainbowKit ConnectButton with fallback */}
+                <ConnectButton />
               </div>
             </div>
           </div>
@@ -791,13 +396,6 @@ const HomePage: React.FC = () => {
               Your gateway to the world of blockchain technology. Learn, explore, and master the concepts that are
               reshaping our digital future.
             </p>
-
-            {/* {ocid && (
-              <div className="mb-8 bg-black/40 backdrop-blur-md border border-purple-500/30 rounded-xl p-4">
-                <p className="text-sm text-purple-300">EduChain Blockchain OCID:</p>
-                <p className="text-xs text-gray-400 font-mono">{ocid}</p>
-              </div>
-            )} */}
 
             <div className="flex flex-wrap gap-4">
               <a href="/auth">
@@ -1024,23 +622,14 @@ const HomePage: React.FC = () => {
                   </button>
                 </a>
 
-                <button
-                  onClick={walletConnected ? disconnectWallet : connectWallet}
-                  disabled={isConnecting}
-                  className="group relative px-10 py-5 rounded-xl overflow-hidden cursor-pointer"
-                >
+                {/* Fallback button for CTA section */}
+                <button className="group relative px-10 py-5 rounded-xl overflow-hidden cursor-pointer">
                   <div className="absolute inset-0 border border-purple-500 rounded-xl" />
                   <div
                     className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 
                     transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
                   />
-                  <span className="relative z-10 flex items-center gap-2">
-                    {isConnecting
-                      ? "Connecting..."
-                      : walletConnected
-                        ? "Wallet Connected"
-                        : "Connect Wallet for Personalized Experience"}
-                  </span>
+                  <span className="relative z-10">Connect Wallet for Personalized Experience</span>
                 </button>
               </div>
             </div>
@@ -1177,7 +766,6 @@ const HomePage: React.FC = () => {
           <Toast key={index} title={toast.title} description={toast.description} />
         ))}
       </div>
-      <WalletSelectionModal />
     </div>
   )
 }

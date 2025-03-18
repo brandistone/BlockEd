@@ -11,6 +11,7 @@ import DevelopersPage from './Pages/DevelopersPage';
 import BeginnersPage from './Pages/BeginnersPage';
 import AuthPage from './Pages/AuthPage';
 import OnboardingPage from './Pages/OnboardingPage';
+import { Providers } from './Pages/providers';
 
 const router = createBrowserRouter([
  
@@ -50,6 +51,9 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <Providers>
     <RouterProvider router={router} />
+    </Providers>
   </React.StrictMode>
+  
 );
