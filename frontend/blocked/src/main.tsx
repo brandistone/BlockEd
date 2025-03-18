@@ -11,7 +11,8 @@ import DevelopersPage from './Pages/DevelopersPage';
 import BeginnersPage from './Pages/BeginnersPage';
 import AuthPage from './Pages/AuthPage';
 import OnboardingPage from './Pages/OnboardingPage';
-import { Providers } from './Pages/providers';
+import { Providers } from "./components/provider";
+
 
 const router = createBrowserRouter([
  

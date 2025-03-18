@@ -150,59 +150,7 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({ children, delay, onClick, i
   )
 }
 
-// Custom connect wallet button for when RainbowKit is not available
-const FallbackConnectButton = () => {
-  return (
-    <button className="relative px-8 py-3 group overflow-hidden rounded-xl cursor-pointer">
-      <div
-        className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-70 
-                group-hover:opacity-100 transition-opacity duration-300"
-      />
-      <div
-        className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 blur-xl 
-                group-hover:blur-2xl transition-all duration-300"
-      />
-      <span className="relative z-10 flex items-center gap-2">Connect Wallet</span>
-    </button>
-  )
-}
 
-// Wrapper component for RainbowKit ConnectButton
-const WalletConnectButton = () => {
-  // Check if we're in a browser environment and if window.wagmi exists
-  const [isWagmiAvailable, setIsWagmiAvailable] = useState(false)
-
-  useEffect(() => {
-    // Check if we're in a browser and if wagmi is available
-    try {
-      // This is a simple check to see if we're in the WagmiProvider context
-      // We don't actually use the import, just check if it's available
-      setIsWagmiAvailable(true)
-    } catch (error) {
-      console.error("Wagmi provider not available:", error)
-      setIsWagmiAvailable(false)
-    }
-  }, [])
-
-  if (!isWagmiAvailable) {
-    return <FallbackConnectButton />
-  }
-
-  // Only render the ConnectButton if wagmi is available
-  try {
-    return (
-      <div className="relative overflow-hidden rounded-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl blur-xl"></div>
-        <div className="relative z-10">
-          <ConnectButton chainStatus="icon" showBalance={false} />
-        </div>
-      </div>
-    )
-  } catch (error) {
-    console.error("Error rendering ConnectButton:", error)
-    return <FallbackConnectButton />
-  }
-}
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate()
@@ -419,7 +367,7 @@ const HomePage: React.FC = () => {
                     className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 
                     transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
                   />
-                  <span className="relative z-10">Demo</span>
+                  <span className="relative z-10">WalkThrough</span>
                 </button>
               </a>
 
@@ -449,7 +397,7 @@ const HomePage: React.FC = () => {
                 />
               ))}
               <img
-                src="/placeholder.svg?height=500&width=500"
+                src="/edu.webp?height=500&width=500"
                 alt="Blockchain visualization"
                 className="relative z-10 w-full h-auto object-cover rounded-3xl transform 
                   group-hover:scale-105 group-hover:rotate-3 transition-all duration-700"
